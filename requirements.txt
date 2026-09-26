@@ -1,0 +1,21 @@
+fastapi
+uvicorn[standard]
+sqlalchemy
+psycopg[binary]
+alembic
+pgvector
+pydantic
+pydantic-settings
+pwdlib[argon2]
+PyJWT
+python-multipart
+PyMuPDF
+python-docx
+# Report export: Markdown -> DOCX / PDF (PDF via PyMuPDF).
+markdown-it-py
+faster-whisper
+# Optional, for transcription on an NVIDIA GPU (Windows/Linux, CUDA 12):
+#   pip install nvidia-cublas-cu12 "nvidia-cudnn-cu12==9.*"
+# Without them Whisper runs on the CPU (much slower).
+sentence-transformers
+httpx

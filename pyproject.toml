@@ -1,0 +1,9 @@
+[tool.ruff]
+target-version = "py312"
+line-length = 100
+
+[tool.ruff.lint.isort]
+known-first-party = ["app"]
+# The local `alembic/` migrations folder would otherwise make ruff treat the
+# alembic package as first-party.
+known-third-party = ["alembic"]
