@@ -17,7 +17,7 @@ _session_factory: sessionmaker[Session] | None = None
 
 
 @event.listens_for(Engine, "connect")
-def _enable_sqlite_foreign_keys(dbapi_connection: Any, _connection_record: Any) -> None:
+def _configure_sqlite_connection(dbapi_connection: Any, _connection_record: Any) -> None:
     """SQLite ignores FOREIGN KEY / ON DELETE CASCADE unless this is set per connection.
 
     Registered on every Engine (including test engines) so SQLite behaves like
@@ -26,6 +26,11 @@ def _enable_sqlite_foreign_keys(dbapi_connection: Any, _connection_record: Any) 
     if isinstance(dbapi_connection, sqlite3.Connection):
         cursor = dbapi_connection.cursor()
         cursor.execute("PRAGMA foreign_keys=ON")
+        # The background workers write while requests read and write: WAL lets
+        # reads carry on during a write, and a busy writer waits its turn (up
+        # to 5 s) instead of failing with "database is locked".
+        cursor.execute("PRAGMA journal_mode=WAL")
+        cursor.execute("PRAGMA busy_timeout=5000")
         cursor.close()
 
 

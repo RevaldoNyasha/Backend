@@ -12,10 +12,17 @@ Set-Location (Split-Path $PSScriptRoot -Parent)
 
 $port = 8000
 
+# A terminal opened before Tailscale was installed doesn't have it on PATH yet.
+$tailscaleDir = Join-Path $env:ProgramFiles 'Tailscale'
+if (-not (Get-Command tailscale -ErrorAction SilentlyContinue) -and (Test-Path "$tailscaleDir\tailscale.exe")) {
+    $env:Path += ";$tailscaleDir"
+}
+
 if (Get-Command tailscale -ErrorAction SilentlyContinue) {
     # Idempotent: publishes https://<this machine>.ts.net -> http://127.0.0.1:8000 and
     # keeps it on in the background (also after reboots) until `tailscale funnel reset`.
-    tailscale funnel --bg $port | Out-Null
+    # Not piped to Out-Null: on first use it prints a link to enable Funnel and waits for it.
+    tailscale funnel --bg $port
     Write-Host "Public API:" -ForegroundColor Green
     tailscale funnel status
 } else {
